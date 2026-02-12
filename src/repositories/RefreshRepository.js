@@ -10,6 +10,13 @@ class RefreshRepository extends Base {
     const updatedToken = await Refresh.updateOne(filter, { expiresAt: time });
     return updatedToken;
   }
+
+  async populateUser(id, fields) {
+    const refreshToken = await Refresh.findOne({
+      user: id,
+    }).populate("user", fields);
+    return refreshToken;
+  }
 }
 
 export default new RefreshRepository();

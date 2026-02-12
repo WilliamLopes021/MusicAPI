@@ -6,25 +6,44 @@ class PostRepository extends Base {
     super(Post);
   }
 
-  async createComment(id, userId) {
+  async createComment(id, userId, commentText) {
     const post = await Post.findById(id);
 
-    post.findOne({})
+    post.comments.push({
+      user: userId,
+      body: commentText,
+    });
+
+    await post.save();
+
+    await post.populate("comments.user", "_id name photoUrl");
     return post;
   }
 
-  async updateComment(id, commentId, dataObj) {
-    const post = await Post.findById(id);
-    if (!post) return null;
+  async updateComment(id, commentId, body) {
+    const post = await Post.updateOne(
+      { _id: id, "comments._id": commentId },
+      {
+        $set: {
+          "comments.$.body": body,
+        },
+      },
+    );
+    return post;
+  }
 
-    const comment = post.comments.id(commentId);
+  async destroyComment(id, commentId) {
+    const post = await Post.updateOne(
+      {
+        _id: id,
+      },
+      {
+        $pull: {
+          comments: { _id: commentId },
+        },
+      },
+    );
 
-    for (let entries of Object.entries(dataObj)) {
-      const [key, value] = entries;
-      comment[key] = value;
-    }
-
-    await post.save();
     return post;
   }
 }

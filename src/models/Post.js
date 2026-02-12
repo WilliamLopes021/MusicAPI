@@ -15,7 +15,7 @@ const postSchema = new Schema(
     thumb: { type: String, default: null },
     video: { type: String, default: null },
     title: { type: String, required: true, maxlength: 50 },
-    description: { type: String, required: true, maxlength: 255, default: `` },
+    description: { type: String, required: true, maxlength: 500, default: `` },
     flags: { type: String, enum: flagTypes },
     creator: {
       type: Schema.Types.ObjectId,

@@ -47,7 +47,7 @@ const userController = {
 
   async show(req, res) {
     try {
-      const response = await userService.show(req?.user.id);
+      const response = await userService.show(req.params.id);
 
       if (response?.length > 0) {
         res.status(400).json(response);

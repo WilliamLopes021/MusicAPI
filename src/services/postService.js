@@ -10,10 +10,14 @@ const postService = {
       throw new AppError("ID inválido.", 400);
     }
 
+    console.log(data);
     for (let entries of Object.entries(data)) {
       const [key, value] = entries;
       const fn = postValidator[key];
-      if (!fn(value)) throw new AppError(`Campo ${key} inválido.`, 400);
+      if (!fn(value)) {
+        console.log(key, value);
+        throw new AppError(`Campo ${key} inválido.`, 400);
+      }
     }
 
     const user = await userRepository.show({ _id: id });

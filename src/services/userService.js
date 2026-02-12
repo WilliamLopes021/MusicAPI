@@ -2,6 +2,7 @@ import bcrypt from "bcryptjs";
 import validator from "validator";
 import jwt from "jsonwebtoken";
 import { config } from "dotenv";
+import { generateToken } from "../utils/refreshUtils.js";
 import UserRepository from "../repositories/userRepository.js";
 import RefreshRepository from "../repositories/RefreshRepository.js";
 import emailService from "./emailService.js";
@@ -31,9 +32,8 @@ const userService = {
 
     const passwordHash = await bcrypt.hash(body.password, 12);
 
+    const { name, email } = body;
     const { code } = await emailService.sendVerificationMail(email);
-
-    const { name, email } = user;
 
     const newUser = await UserRepository.create({
       name,
@@ -78,9 +78,18 @@ const userService = {
         },
       );
 
-      const refreshToken = await RefreshRepository.findOne({
-        user: token.id,
-      }).populate("user", "_id email");
+      const rawToken = generateToken();
+      const hashedToken = await bcrypt.hash(rawToken, 10);
+
+      const refreshToken = await RefreshRepository.create({
+        token: hashedToken,
+        userInfo: activeUser._id,
+      });
+
+      await refreshToken.populate({
+        path: "userInfo",
+        select: "_id email",
+      });
 
       return { activeUser, acessToken, refreshToken };
     }

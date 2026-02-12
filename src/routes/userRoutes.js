@@ -5,7 +5,7 @@ import authMiddleware from "../middlewares/authMiddleware.js";
 const router = Router();
 
 router.post("/", userController.create);
-router.get("/", authMiddleware, userController.show);
+router.get("/:id", userController.show);
 router.put("/", authMiddleware, userController.update);
 router.delete("/", authMiddleware, userController.destroy);
 

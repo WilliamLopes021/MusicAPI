@@ -7,6 +7,7 @@ const refreshSchema = new Schema(
       ref: "User",
       required: true,
     },
+    token: String,
     expiresAt: {
       type: Date,
       required: true,
