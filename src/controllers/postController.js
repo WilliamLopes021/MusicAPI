@@ -10,7 +10,7 @@ const postController = {
     }
   },
 
-  async destroy(req, res) {
+  async destroy(req, res, next) {
     try {
       const deletedPost = await postService.destroy(
         req.params.id,
@@ -22,7 +22,7 @@ const postController = {
     }
   },
 
-  async show(req, res) {
+  async show(req, res, next) {
     try {
       const post = await postService.show(req.params.id);
       res.json(post);
@@ -31,7 +31,7 @@ const postController = {
     }
   },
 
-  async update(req, res) {
+  async update(req, res, next) {
     try {
       const updatedPost = await postService.update(
         req.params.id,
@@ -44,10 +44,10 @@ const postController = {
     }
   },
 
-  async index(req, res) {
+  async index(req, res, next) {
     try {
       const allPosts = await postService.index();
-      if (allPosts?.message) return res.status(200).json(allPosts?.message);
+      if (allPosts?.message) return res.status(200).json(allPosts.message);
 
       res.json(allPosts);
     } catch (e) {

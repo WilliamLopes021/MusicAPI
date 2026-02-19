@@ -1,5 +1,6 @@
 import app from "./app.js";
 import connection from "./src/database/dbConnection.js";
+import "dotenv/config";
 
 (async function server() {
   await connection();

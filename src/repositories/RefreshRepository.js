@@ -7,14 +7,18 @@ class RefreshRepository extends Base {
   }
 
   async updateTime(filter, time = "7d") {
-    const updatedToken = await Refresh.updateOne(filter, { expiresAt: time });
+    const updatedToken = await this.model.updateOne(filter, {
+      expiresAt: time,
+    });
     return updatedToken;
   }
 
-  async populateUser(id, fields) {
-    const refreshToken = await Refresh.findOne({
-      user: id,
-    }).populate("user", fields);
+  async populateUser(id, ...fields) {
+    const refreshToken = await this.model
+      .findOne({
+        user: id,
+      })
+      .populate("user", fields.join(" "));
     return refreshToken;
   }
 }

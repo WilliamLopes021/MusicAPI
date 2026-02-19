@@ -1,15 +1,12 @@
 import bcrypt from "bcryptjs";
-import validator from "validator";
 import jwt from "jsonwebtoken";
-import { config } from "dotenv";
-import { generateToken } from "../utils/refreshUtils.js";
 import UserRepository from "../repositories/userRepository.js";
 import RefreshRepository from "../repositories/RefreshRepository.js";
 import emailService from "./emailService.js";
 import generalValidator from "../utils/userValidator.js";
 import AppError from "../error/AppError.js";
-
-config();
+import verificationService from "./verificationService.js";
+import validateString from "../utils/validateString.js";
 
 const userService = {
   async create(body) {
@@ -55,48 +52,6 @@ const userService = {
     return { success: true, token };
   },
 
-  async validateCode(body, token) {
-    if (!token?.code) {
-      throw new AppError(`Usuário não autenticado.`, 401);
-    }
-
-    if (!body.code || typeof body.code !== "number") {
-      throw new AppError(`Código inválido`, 400);
-    }
-
-    if (body.code === token.code) {
-      const activeUser = await UserRepository.update(
-        { _id: token.id },
-        { isActive: true },
-      );
-
-      const acessToken = jwt.sign(
-        { id: activeUser._id, email: activeUser.email },
-        process.env.JWT_SECRET,
-        {
-          expiresIn: "15m",
-        },
-      );
-
-      const rawToken = generateToken();
-      const hashedToken = await bcrypt.hash(rawToken, 10);
-
-      const refreshToken = await RefreshRepository.create({
-        token: hashedToken,
-        userInfo: activeUser._id,
-      });
-
-      await refreshToken.populate({
-        path: "userInfo",
-        select: "_id email",
-      });
-
-      return { activeUser, acessToken, refreshToken };
-    }
-
-    throw new AppError(`Código errado.`, 400);
-  },
-
   async update(id, body) {
     if (!id || typeof id !== "string") {
       throw new AppError("ID inválido.", 400);
@@ -110,6 +65,7 @@ const userService = {
 
     for (let value of Object.entries(body)) {
       const [key, val] = value;
+      if (key === "code") continue;
       const fn = generalValidator[key];
       if (!fn(val)) throw new AppError(`Dado inválido no campo ${key}`, 400);
     }
@@ -139,13 +95,13 @@ const userService = {
       throw new AppError("Usuário inválido.", 400);
     }
 
-    const user = await UserRepository.show({ id: id });
+    const user = await UserRepository.show({ _id: id });
 
     if (!user || !user.isActive) {
       throw new AppError("Usuário inválido.", 400);
     }
 
-    const refreshDeleted = await RefreshRepository.destroy({ userId: id });
+    const refreshDeleted = await RefreshRepository.destroy({ userInfo: id });
 
     if (!refreshDeleted)
       throw new AppError("Erro ao deletar Refresh Token.", 500);
@@ -154,30 +110,67 @@ const userService = {
     return { success: true };
   },
 
-  async resendCode(body) {
-    const { email } = body;
+  async changeEmail(email, id) {
+    validateString(id, "ID");
+    validateString(email, "Email");
 
-    if (!email || !validator.isEmail(email)) {
-      throw new AppError(`E-mail inválido`, 400);
+    const user = await UserRepository.show({ _id: id });
+
+    if (!user || !user.isActive) {
+      throw new AppError("Usuário inválido.", 400);
     }
 
-    const user = await UserRepository.show({ email });
-
-    if (!user) throw new AppError(`Usuário não encontrado`, 404);
-
-    const { code } = await emailService.sendVerificationMail(email);
+    const { code } = emailService.sendVerificationMail(email);
 
     const payload = {
-      id: user._id,
       code,
-      type: "ativacao",
+      id,
+      email,
+      type: "emailChange",
     };
 
-    const token = jwt.sign(payload, process.env.JWT_SECRET, {
+    const acessToken = jwt.sign(payload, process.env.JWT_SECRET, {
       expiresIn: "6m",
     });
 
-    return { success: true, token };
+    return { success: true, acessToken };
+  },
+
+  async confirmEmail(code, token) {
+    const { success } = verificationService.compareCode(token?.code, code);
+
+    if (success) {
+      const activeUser = await UserRepository.update(
+        { _id: token.id },
+        { email: token.email },
+      );
+
+      const acessToken = jwt.sign(
+        { id: activeUser._id, email: activeUser.email },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: "15m",
+        },
+      );
+
+      const rawToken = generateToken();
+      const hashedToken = await bcrypt.hash(rawToken, 10);
+
+      const refreshToken = await RefreshRepository.create({
+        token: hashedToken,
+        userInfo: activeUser._id,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      });
+
+      await refreshToken.populate({
+        path: "userInfo",
+        select: "_id email",
+      });
+
+      return { activeUser, acessToken, refreshToken };
+    }
+
+    throw new AppError(`Código errado.`, 400);
   },
 };
 

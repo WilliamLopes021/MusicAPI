@@ -4,13 +4,11 @@ import authMiddleware from "../middlewares/authMiddleware.js";
 
 const router = Router();
 
-router.post("/", userController.create);
 router.get("/:id", userController.show);
+router.post("/", userController.create);
 router.put("/", authMiddleware, userController.update);
 router.delete("/", authMiddleware, userController.destroy);
-
-// Autenticação/E-mail
-router.post("/code", authMiddleware, userController.validateCode);
-router.post("/resend", userController.resendCode);
+router.patch("/email", authMiddleware, userController.changeEmail);
+router.patch("/email/confirm", authMiddleware, userController.confirmEmail);
 
 export default router;

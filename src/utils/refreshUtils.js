@@ -1,5 +1,7 @@
 import crypto from "node:crypto";
 
 export function generateToken() {
-  return crypto.randomBytes.toString("hex");
+  const result = crypto.randomBytes(13).toString("hex");
+  return result;
 }
+

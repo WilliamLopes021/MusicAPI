@@ -4,7 +4,7 @@ import authMiddleware from "../middlewares/authMiddleware.js";
 
 const router = Router();
 
-router.post("/", authMiddleware, commentController.create);
+router.post("/:postId", authMiddleware, commentController.create);
 router.put("/:postId/comment/:commentId", authMiddleware, commentController.update);
 router.delete("/:postId/comment/:commentId", authMiddleware, commentController.update);
 

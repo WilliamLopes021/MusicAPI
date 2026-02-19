@@ -4,7 +4,7 @@ const commentController = {
   async create(req, res) {
     try {
       const response = await commentService.create(
-        req.user.id,
+        req?.user.id,
         req.params.id,
         req.body,
       );

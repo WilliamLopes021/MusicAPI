@@ -23,7 +23,7 @@ export default function (req, res, next) {
   } catch (e) {
     const decoded = jwt.decode(token);
 
-    if (decoded?.type === "ativacao") {
+    if (decoded?.type) {
       res.status(500).json({ error: "Código expirado." });
     }
 

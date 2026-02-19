@@ -10,21 +10,27 @@ const postService = {
       throw new AppError("ID inválido.", 400);
     }
 
-    console.log(data);
     for (let entries of Object.entries(data)) {
       const [key, value] = entries;
       const fn = postValidator[key];
       if (!fn(value)) {
-        console.log(key, value);
         throw new AppError(`Campo ${key} inválido.`, 400);
       }
     }
+
+    const { flags, title, description } = data;
 
     const user = await userRepository.show({ _id: id });
     if (!user || !user.isActive)
       throw new AppError("Usuário não encontrado.", 404);
 
-    const createdPost = await PostRepository.create({ ...data, creator: id });
+    const createdPost = await PostRepository.create({
+      creator: id,
+      title: title.trim(),
+      description: description.trim(),
+      flags: flags.trim().split(" "),
+    });
+    
     await createdPost.populate({
       path: "creator",
       select: "_id name photoUrl",
@@ -45,7 +51,7 @@ const postService = {
     const user = await userRepository.show({ _id: userId });
     if (!user) throw new AppError("Usuário não encontrado.", 404);
 
-    if (post.creator._id !== user._id) {
+    if (post.creator.toString() !== user._id.toString()) {
       throw new AppError("Permissão negada.", 401);
     }
 
@@ -53,9 +59,10 @@ const postService = {
     return { success: true };
   },
 
-  async update(id, data, userId) {
+  async update(id, userId, data) {
     for (let value of [userId, id])
       if (!value || typeof value !== "string") {
+        console.log(value);
         throw new AppError("ID inválido.", 400);
       }
 
@@ -63,7 +70,7 @@ const postService = {
 
     if (!post) throw new AppError("Postagem não encontrada.", 404);
 
-    if (post.creatorId !== userId) {
+    if (post.creator.toString() !== userId) {
       throw new AppError("Permissão negada.", 401);
     }
 
@@ -73,7 +80,7 @@ const postService = {
       if (!fn(val)) throw new AppError(`Dado inválido no campo ${key}`, 400);
     }
 
-    post.set();
+    post.set({ ...data });
 
     await post.save();
     return post;
