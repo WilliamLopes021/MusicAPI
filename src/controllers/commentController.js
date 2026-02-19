@@ -1,7 +1,7 @@
 import commentService from "../services/commentService.js";
 
 const commentController = {
-  async create(req, res) {
+  async create(req, res, next) {
     try {
       const response = await commentService.create(
         req?.user.id,
@@ -10,11 +10,11 @@ const commentController = {
       );
       res.status(200).json(response);
     } catch (e) {
-      res.status(404).json({ error: e.message });
+      next(e);
     }
   },
 
-  async update(req, res) {
+  async update(req, res, next) {
     try {
       const updated = await commentService.update(
         req.user.id,
@@ -24,10 +24,19 @@ const commentController = {
 
       return res.status(200).json(updated);
     } catch (e) {
-      res.status(404).json({ error: e.message });
+      next(e);
     }
   },
-  async destroy(req, res) {},
+
+  async destroy(req, res, next) {
+    try {
+      const updated = await commentService.destroy(req.user.id, req.params);
+
+      return res.status(200).json(updated);
+    } catch (e) {
+      next(e);
+    }
+  },
 };
 
 export default commentController;

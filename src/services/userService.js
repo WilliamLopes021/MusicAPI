@@ -6,7 +6,9 @@ import emailService from "./emailService.js";
 import generalValidator from "../utils/userValidator.js";
 import AppError from "../error/AppError.js";
 import verificationService from "./verificationService.js";
+import VerificationRepository from "../repositories/VerificationRepository.js";
 import validateString from "../utils/validateString.js";
+import VerificationRepository from "../repositories/VerificationRepository.js";
 
 const userService = {
   async create(body) {
@@ -14,7 +16,7 @@ const userService = {
     const reference = Object.keys(generalValidator);
 
     if (entries.length !== reference.length) {
-      throw new Error("Entrada de dados incompleta.", 400);
+      throw new AppError("Entrada de dados incompleta.", 400);
     }
 
     for (let value of entries) {
@@ -41,15 +43,22 @@ const userService = {
 
     const payload = {
       id: newUser._id,
-      code,
-      type: "ativacao",
+      type: "activation",
     };
+
+    const verification = await VerificationRepository.create({
+      userId: newUser._id,
+      payload: email,
+      type: "activation",
+      code,
+      expiresAt: new Date(Date.now() + 6 * 60 * 1000),
+    });
 
     const token = jwt.sign(payload, process.env.JWT_SECRET, {
       expiresIn: "6m",
     });
 
-    return { success: true, token };
+    return { success: true, token, verification };
   },
 
   async update(id, body) {
@@ -120,12 +129,19 @@ const userService = {
       throw new AppError("Usuário inválido.", 400);
     }
 
-    const { code } = emailService.sendVerificationMail(email);
+    const { code } = await emailService.sendVerificationMail(email);
+
+    const savedCredentials = await VerificationRepository.create({
+      userId: user._id,
+      payload: email,
+      type: "emailChange",
+      code,
+      expiresAt: new Date(Date.now() + 6 * 60 * 1000),
+    });
 
     const payload = {
-      code,
       id,
-      email,
+      code,
       type: "emailChange",
     };
 
@@ -133,16 +149,40 @@ const userService = {
       expiresIn: "6m",
     });
 
-    return { success: true, acessToken };
+    return {
+      success: true,
+      acessToken,
+      message: "Código de verificação enviado para o novo e-mail.",
+      data: savedCredentials,
+    };
   },
 
-  async confirmEmail(code, token) {
-    const { success } = verificationService.compareCode(token?.code, code);
+  async confirmEmailChange(code, token) {
+    if (token?.type !== "emailChange") {
+      throw new AppError("Token inválido para esta operação.", 400);
+    }
+
+    const savedToken = await VerificationRepository.show({
+      userId: token.id,
+      type: "emailChange",
+    });
+
+    if (!savedToken) {
+      throw new AppError(
+        "Token de verificação não encontrado. Solicite um novo código.",
+        404,
+      );
+    }
+
+    const { success } = verificationService.compareCode(
+      savedToken.code.toString(),
+      code.toString(),
+    );
 
     if (success) {
       const activeUser = await UserRepository.update(
         { _id: token.id },
-        { email: token.email },
+        { email: savedToken.payload.toString() },
       );
 
       const acessToken = jwt.sign(
@@ -153,21 +193,12 @@ const userService = {
         },
       );
 
-      const rawToken = generateToken();
-      const hashedToken = await bcrypt.hash(rawToken, 10);
-
-      const refreshToken = await RefreshRepository.create({
-        token: hashedToken,
-        userInfo: activeUser._id,
-        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      });
-
-      await refreshToken.populate({
-        path: "userInfo",
-        select: "_id email",
-      });
-
-      return { activeUser, acessToken, refreshToken };
+      return {
+        success: true,
+        message: "E-mail alterado com sucesso.",
+        activeUser,
+        acessToken,
+      };
     }
 
     throw new AppError(`Código errado.`, 400);

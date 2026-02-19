@@ -13,14 +13,15 @@ const commentService = {
     validateString(body, "Texto inválido.");
 
     const user = await UserRepository.show({ _id: userId });
+
+    if (!user || !user.isActive) {
+      throw new AppError("Usuário inválido.", 400);
+    }
+
     const post = await PostRepository.show({ _id: postId });
 
     if (!post) {
       throw new AppError("Post não encontrado.", 400);
-    }
-
-    if (!user || !user.isActive) {
-      throw new AppError("Usuário inválido.", 400);
     }
 
     const comment = await CommentRepository.create({
@@ -32,11 +33,10 @@ const commentService = {
     return comment;
   },
 
-  async update(userId, postId, commentId, data) {
+  async update(userId, commentId, data) {
     const { body } = data;
 
     validateString(userId, "UserID");
-    validateString(postId, "PostID");
     validateString(commentId, "commentId");
     validateString(body, "Texto inválido.");
 
@@ -45,9 +45,6 @@ const commentService = {
     if (!user || !user.isActive) {
       throw new AppError("Usuário inválido.", 400);
     }
-
-    const post = await PostRepository.show({ _id: postId });
-    if (!post) throw new AppError("Post não encontrado.", 404);
 
     const userComment = await CommentRepository.show({ _id: commentId });
 
@@ -65,13 +62,9 @@ const commentService = {
     return userComment;
   },
 
-  async destroy(userId, postId, commentId) {
+  async destroy(userId, commentId) {
     validateString(userId, "UserID");
-    validateString(postId, "PostID");
     validateString(commentId, "CommentId");
-
-    const post = await PostRepository.show({ _id: postId });
-    if (!post) throw new AppError("Post não encontrado.", 404);
 
     const user = await UserRepository.show({ _id: userId });
 
@@ -89,8 +82,7 @@ const commentService = {
       throw new AppError("Mudança não permitida.", 401);
     }
 
-    comment.deleteOne();
-    await comment.save();
+    await comment.deleteOne();
 
     return { success: true };
   },

@@ -9,6 +9,6 @@ router.post("/", userController.create);
 router.put("/", authMiddleware, userController.update);
 router.delete("/", authMiddleware, userController.destroy);
 router.patch("/email", authMiddleware, userController.changeEmail);
-router.patch("/email/confirm", authMiddleware, userController.confirmEmail);
+router.patch("/email/confirm", authMiddleware, userController.confirmEmailChange);
 
 export default router;

@@ -20,15 +20,16 @@ const authController = {
       next(e);
     }
   },
-  async activateAccount(req, res) {
+  
+  async activateAccount(req, res, next) {
     try {
       const response = await authService.activateAccount(req.body, req.user);
       res.json(response);
     } catch (e) {
-      res.status(404).json({ error: e.message });
+      next(e);
     }
   },
-  async resend(req, res) {
+  async resend(req, res, next) {
     try {
       const response = await authService.resendCode(req.body);
 
@@ -39,7 +40,7 @@ const authController = {
 
       res.json(response);
     } catch (e) {
-      res.status(400).json({ error: e.message });
+      next(e);
     }
   },
 };
