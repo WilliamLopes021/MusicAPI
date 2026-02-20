@@ -1,4 +1,4 @@
-import { flagTypes } from "../models/Post.js";
+import { flagTypes } from "../domain/entities/Post.js";
 
 const validationRules = {
   title: (v) => {

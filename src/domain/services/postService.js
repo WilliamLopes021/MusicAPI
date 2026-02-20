@@ -1,7 +1,7 @@
-import AppError from "../error/AppError.js";
+import AppError from "../errors/AppError.js";
 import PostRepository from "../repositories/PostRepository.js";
 import userRepository from "../repositories/userRepository.js";
-import postValidator from "../utils/postValidator.js";
+import postValidator from "../../utils/postValidator.js";
 
 const postService = {
   async create(userId, data) {

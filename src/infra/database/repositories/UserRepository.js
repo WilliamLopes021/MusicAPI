@@ -1,5 +1,5 @@
 import Base from "./Base.js";
-import User from "../models/User.js";
+import User from "../domain/entities/User.js";
 
 class UserRepository extends Base {
   constructor() {

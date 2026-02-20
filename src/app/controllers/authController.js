@@ -29,6 +29,7 @@ const authController = {
       next(e);
     }
   },
+  
   async resend(req, res, next) {
     try {
       const response = await authService.resendCode(req.body);
