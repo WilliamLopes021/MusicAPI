@@ -1,5 +1,5 @@
-import app from "./app.js";
-import connection from "./src/database/dbConnection.js";
+import connection from '../config/databaseConfig.js';
+import app from "../app/app.js";
 import "dotenv/config";
 
 (async function server() {

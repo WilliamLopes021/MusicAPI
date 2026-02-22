@@ -1,10 +1,9 @@
 import e from "express";
 import cookieParser from "cookie-parser";
-import errorHandler from "./src/middlewares/errorHandler.js";
-import userRoutes from "./src/routes/userRoutes.js";
-import postRoutes from "./src/routes/postRoutes.js";
-import commentRoutes from "./src/routes/commentRoutes.js";
-import authRoutes from "./src/routes/authRoutes.js";
+import userRoutes from "./routes/user.routes.js";
+import authRoutes from "./routes/auth.routes.js";
+import commentRoutes from "./routes/comment.routes.js";
+import postRoutes from "./routes/post.routes.js";
 
 class App {
   constructor() {
