@@ -4,13 +4,12 @@ import { IArticleDocument } from "../schemas";
 
 export class ArticleMapper {
   static toEntity(doc: IArticleDocument): Article {
-    return new Article(
-      UniqueEntityId.createId(doc._id.toString()),
-      UniqueEntityId.createId(doc.authorId.toString()),
-      doc.title,
-      doc.content,
-      doc.available,
-    );
+    return new Article({
+      available: doc.available,
+      _title: doc.title,
+      _content: doc.content,
+      authorId: UniqueEntityId.create(doc.authorId.toString()),
+    });
   }
 
   static toDocument(entity: Article) {

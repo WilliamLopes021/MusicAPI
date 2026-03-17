@@ -1,40 +1,42 @@
-import { Email, Password, UniqueEntityId } from "../value-objects";
+import { UserProps } from "../types/props/UserProps";
+import { UniqueEntityId, Email, Password } from "../value-objects";
 
 export class User {
   constructor(
-    public readonly id: UniqueEntityId,
-    private _name: string,
-    private _email: Email,
-    private _password: Password,
-    private _description: string,
-    private activated: boolean = false,
+    private props: UserProps,
+    private readonly _id?: UniqueEntityId,
+
   ) {}
 
   activateAccount(): void{
     if(this.activated) throw new Error('Conta já ativada.');
-    this.activated = true;
+    this.props._activated = true;
   }
 
   inertAccount(): void{
-    if(!this.activated) throw new Error('Conta já desativada.');
-    this.activated = false;
+    if(!this.props._activated) throw new Error('Conta já desativada.');
+    this.props._activated = false;
   }
 
   // Getters
   get name(): string {
-    return this._name;
+    return this.props._name;
   }
 
   get password(): string {
-    return this._password.getValue();
+    return this.props._password.getValue();
   }
 
   get email(): Email {
-    return this._email;
+    return this.props._email;
   }
 
   get description(): string {
-    return this._description;
+    return this.props._description;
+  }
+
+  get activated(): boolean{
+    return this.props._activated;
   }
 
   // Setters
@@ -47,15 +49,15 @@ export class User {
       throw new Error("Nome não pode estar vazio.");
     }
 
-    this._name = newName;
+    this.props._name = newName;
   }
 
   set password(newPass: string) {
-    this._password = Password.createPassword(newPass);
+    this.props._password = Password.createPassword(newPass);
   }
 
   set email(newEmail: string) {
-    this._email = Email.createEmail(newEmail);
+    this.props._email = Email.createEmail(newEmail);
   }
 
   set description(desc: string) {
@@ -63,6 +65,6 @@ export class User {
     if (desc.length > 500)
       throw new Error("O máximo permitido são 500 caracteres.");
 
-    this._description = desc;
+    this.props._description = desc;
   }
 }

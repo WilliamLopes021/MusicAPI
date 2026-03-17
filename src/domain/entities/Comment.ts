@@ -1,11 +1,10 @@
+import { CommentProps } from "../types/props/CommentProps";
 import { UniqueEntityId } from "../value-objects";
 
 export class Comment {
   constructor(
-    public readonly id: UniqueEntityId,
-    private _content: string,
-    public articleId: UniqueEntityId,
-    public authorId: UniqueEntityId,
+    private props: CommentProps,
+    public readonly id?: UniqueEntityId,
   ) {}
 
   set content(value: string){
@@ -15,6 +14,6 @@ export class Comment {
   }
 
   get content(): string{
-    return this._content;
+    return this.props._content;
   }
 }

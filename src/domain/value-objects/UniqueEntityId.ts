@@ -1,15 +1,26 @@
 export class UniqueEntityId {
-  constructor(private readonly id: string) {}
+  private constructor(private readonly value: string) {}
 
-  static createId(id: string): UniqueEntityId {
-    if (typeof id !== "string" || id.trim() === "") {
-      throw new Error("ID inválido.");
+  static create(value?: string): UniqueEntityId {
+    if (value) {
+      if (!this.isValid(value)) {
+        throw new Error('Invalid ID');
+      }
+      return new UniqueEntityId(value);
     }
 
-    return new UniqueEntityId(id);
+    return new UniqueEntityId(crypto.randomUUID());
   }
 
-  getValue(): string {
-    return this.id;
+  static isValid(value: string): boolean {
+    return value.length > 0;
+  }
+
+  toString(): string {
+    return this.value;
+  }
+
+  equals(id: UniqueEntityId): boolean {
+    return this.value === id.value;
   }
 }

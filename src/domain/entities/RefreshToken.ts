@@ -1,17 +1,15 @@
+import { RefreshTokenProps } from "../types/props/RefreshTokenProps";
 import { UniqueEntityId, RefreshTokenFormat } from "../value-objects";
 
 export class RefreshToken {
   constructor(
-    public readonly id: UniqueEntityId,
-    public readonly token: RefreshTokenFormat,
-    public readonly userId: UniqueEntityId,
-    private _expiresAt: Date,
-    public revoked: boolean = false,
+    private props: RefreshTokenProps,
+    public readonly id?: UniqueEntityId,
   ) {}
 
   revoke(): void{
-    if(this.revoked) throw new Error('Token já está inválido.')
-    this.revoked = true;
+    if(this.props.revoked) throw new Error('Token já está inválido.')
+    this.props.revoked = true;
   }
 
   set expiresAt(date: Date) {
@@ -19,10 +17,10 @@ export class RefreshToken {
       throw new Error("Data inválida.");
     }
 
-    this._expiresAt = date;
+    this.props._expiresAt = date;
   }
 
   get expiresAt(): Date {
-    return this._expiresAt;
+    return this.props._expiresAt;
   }
 }

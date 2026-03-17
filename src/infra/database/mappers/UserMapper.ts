@@ -19,6 +19,8 @@ export class UserMapper {
       name: entity.name,
       email: entity.email.getValue(),
       password: entity.password,
+      description: entity.description,
+      activated: entity.activated
     };
   }
 }

@@ -1,24 +1,36 @@
+import { ArticleProps } from "../types/props/ArticleProps";
 import { UniqueEntityId } from "../value-objects";
 
 export class Article {
   constructor(
-    public readonly id: UniqueEntityId,
-    public readonly authorId: UniqueEntityId,
-    private _title: string,
-    private _content: string,
-    public available: boolean = true,
+    private props: ArticleProps,
+    public readonly _id?: UniqueEntityId,
   ) {}
 
-  set content(value: string) {
+  //Getters
+  get content(): string {
+    return this.props._content;
+  }
+
+  get title(): string {
+    return this.props._title;
+  }
+
+  get available(): boolean {
+    return this.props.available;
+  }
+
+  get authorId(): UniqueEntityId {
+    return this.props.authorId;
+  } 
+  //Setters
+
+  set content (value: string) {
     if (value.trim() === "" || value.length < 3) {
       throw new Error("O conteúdo de comentário inválido.");
     }
 
-    this._content = value;
-  }
-
-  get content(): string {
-    return this._content;
+    this.props._content = value;
   }
 
   set title(value: string) {
@@ -26,13 +38,9 @@ export class Article {
       throw new Error("O conteúdo de comentário inválido.");
     }
 
-    this._title = value;
+    this.props._title = value;
   }
 
-  get title(): string {
-    return this._title;
-  }
-
-  setUnavailable = () => (this.available = false);
-  setAvailable = () => (this.available = true);
+  setUnavailable = () => (this.props.available = false);
+  setAvailable = () => (this.props.available = true);
 }

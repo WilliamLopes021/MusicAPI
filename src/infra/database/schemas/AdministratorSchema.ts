@@ -2,6 +2,7 @@ import mongoose, { Schema, Types } from "mongoose";
 
 export interface IAdministratorDocument {
   _id: Types.ObjectId;
+  name: string,
   email: string;
   password: string;
   role: string;

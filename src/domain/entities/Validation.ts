@@ -1,18 +1,15 @@
 import { TokenTypes } from "../types";
 import { UniqueEntityId } from "../value-objects";
+import { ValidationProps } from "../types/props/ValidationProps";
 
 export class Validation {
   constructor(
-    public readonly id: UniqueEntityId,
-    public readonly userId: UniqueEntityId,
-    public readonly type: TokenTypes,
-    private _expiresAt: Date,
-    public used: boolean = false,
-    private _code?: number,
+    private props: ValidationProps,
+    private readonly _id?: UniqueEntityId,
   ) {}
 
   get code(): number {
-    return this._code!;
+    return this.props._code!;
   }
 
   set code(value: number) {
@@ -22,7 +19,7 @@ export class Validation {
       throw new Error("Código de validação deve ser um número de 6 dígitos.");
     }
 
-    this._code = value;
+    this.props._code = value;
   }
 
   set expiresAt(date: Date) {
@@ -30,10 +27,10 @@ export class Validation {
       throw new Error("Data inválida.");
     }
 
-    this._expiresAt = date;
+    this.props._expiresAt = date;
   }
 
   get expiresAt(): Date {
-    return this._expiresAt;
+    return this.props._expiresAt;
   }
 }
