@@ -1,4 +1,4 @@
 export interface IHashProvider {
-  hashPassword(password: string): Promise<string>;
+  hash(password: string): Promise<string>;
   comparePassword(plain: string, hash: string): Promise<Boolean>;
 }

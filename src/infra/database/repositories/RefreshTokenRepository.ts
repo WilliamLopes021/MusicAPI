@@ -33,4 +33,8 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
 
     return RefreshTokenMapper.toEntity(doc);
   }
+
+  async deleteMany(obj: Partial<RefreshToken>): Promise<void> {
+    await RefreshTokenModel.deleteMany(obj); 
+  }
 }

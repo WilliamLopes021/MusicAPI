@@ -1,4 +1,5 @@
 import { ITokenProvider } from "../../domain/providers/tokenProvider";
+import { randomBytes } from "node:crypto";
 import jwt from "jsonwebtoken";
 
 export class JwtProvider implements ITokenProvider {
@@ -12,5 +13,9 @@ export class JwtProvider implements ITokenProvider {
     );
 
     return token;
+  }
+
+  generateRawToken(): string {
+    return randomBytes(40).toString("hex");
   }
 }
