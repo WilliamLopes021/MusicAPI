@@ -4,7 +4,7 @@ import { UniqueEntityId, Email, Password } from "../value-objects";
 export class User {
   constructor(
     private props: UserProps,
-    private readonly _id?: UniqueEntityId,
+    public readonly _id?: UniqueEntityId,
 
   ) {}
 

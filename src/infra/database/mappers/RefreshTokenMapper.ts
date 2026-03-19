@@ -1,16 +1,18 @@
 import { RefreshToken } from "../../../domain/entities";
-import { RefreshTokenFormat, UniqueEntityId } from "../../../domain/value-objects";
+import {
+  RefreshTokenFormat,
+  UniqueEntityId,
+} from "../../../domain/value-objects";
 import { IRefreshTokenDocument } from "../schemas";
 
 export class RefreshTokenMapper {
   static toEntity(doc: IRefreshTokenDocument): RefreshToken {
-    return new RefreshToken(
-      UniqueEntityId.createId(doc._id.toString()),
-      RefreshTokenFormat.create(doc.token),
-      UniqueEntityId.createId(doc.userId.toString()),
-      doc.expiresAt,
-      doc.revoked ?? false,
-    );
+    return new RefreshToken({
+      token: RefreshTokenFormat.create(doc.token),
+      userId: UniqueEntityId.create(doc.userId.toString()),
+      _expiresAt: doc.expiresAt,
+      revoked: doc.revoked ?? false,
+    });
   }
 
   static toDocument(entity: RefreshToken) {

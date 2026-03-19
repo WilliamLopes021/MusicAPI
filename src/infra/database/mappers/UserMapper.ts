@@ -5,12 +5,14 @@ import { IUserDocument } from "../schemas";
 export class UserMapper {
   static toEntity(doc: IUserDocument): User {
     return new User(
-      UniqueEntityId.createId(doc._id.toString()),
-      doc.name,
-      Email.createEmail(doc.email),
-      Password.createPassword(doc.password),
-      doc.description,
-      doc.activated
+      {
+        _name: doc.name,
+        _activated: doc.activated,
+        _description: doc.description,
+        _email: Email.createEmail(doc.email),
+        _password: Password.createPassword(doc.password),
+      },
+      UniqueEntityId.create(doc._id.toString()),
     );
   }
 
@@ -20,7 +22,7 @@ export class UserMapper {
       email: entity.email.getValue(),
       password: entity.password,
       description: entity.description,
-      activated: entity.activated
+      activated: entity.activated,
     };
   }
 }

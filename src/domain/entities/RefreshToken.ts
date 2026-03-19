@@ -7,8 +7,8 @@ export class RefreshToken {
     public readonly id?: UniqueEntityId,
   ) {}
 
-  revoke(): void{
-    if(this.props.revoked) throw new Error('Token já está inválido.')
+  revoke(): void {
+    if (this.props.revoked) throw new Error("Token já está inválido.");
     this.props.revoked = true;
   }
 
@@ -22,5 +22,17 @@ export class RefreshToken {
 
   get expiresAt(): Date {
     return this.props._expiresAt;
+  }
+
+  get userId(): UniqueEntityId {
+    return this.props.userId;
+  }
+
+  get revoked(): boolean {
+    return this.props.revoked;
+  }
+
+  get token(): RefreshTokenFormat {
+    return this.props.token;
   }
 }

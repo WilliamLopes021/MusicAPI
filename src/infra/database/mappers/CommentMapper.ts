@@ -4,11 +4,11 @@ import { ICommentDocument } from "../schemas";
 
 export class CommentMapper {
   static toEntity(doc: ICommentDocument): Comment {
-    return new Comment(
-      UniqueEntityId.createId(doc._id.toString()),
-      doc.content,
-      UniqueEntityId.createId(doc.articleId.toString()),
-      UniqueEntityId.createId(doc.authorId.toString()),
+    return new Comment({
+      _content: doc.content,
+      articleId: UniqueEntityId.create(doc.articleId.toString()),
+      authorId: UniqueEntityId.create(doc.authorId.toString()),
+    }
     );
   }
 

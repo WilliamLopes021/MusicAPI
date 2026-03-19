@@ -5,21 +5,20 @@ import { TokenTypes } from "../../../domain/types";
 
 export class ValidationMapper {
   static toEntity(doc: IValidationDocument): Validation {
-    return new Validation(
-      UniqueEntityId.createId(doc._id.toString()),
-      UniqueEntityId.createId(doc.userId.toString()),
-      doc.type as TokenTypes,
-      doc.expiresAt,
-      doc.used ?? false,
-      doc.code,
-    );
+    return new Validation({
+      _expiresAt: doc.expiresAt,
+      type: doc.type as TokenTypes,
+      used: doc.used,
+      userId: UniqueEntityId.create(doc.userId.toString()),
+      _code: doc.code,
+    });
   }
 
   static toDocument(entity: Validation) {
     return {
       userId: entity.userId.toString(),
       type: entity.type,
-      code: entity?.code,/*  */
+      code: entity?.code,
       expiresAt: entity.expiresAt,
       used: entity.used,
     };

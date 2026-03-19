@@ -7,13 +7,21 @@ export class Comment {
     public readonly id?: UniqueEntityId,
   ) {}
 
-  set content(value: string){
-    if(value.trim() === ''){
-      throw new Error('O conteúdo do comentário não pode estar vazio.')
+  set content(value: string) {
+    if (value.trim() === "") {
+      throw new Error("O conteúdo do comentário não pode estar vazio.");
     }
   }
 
-  get content(): string{
+  get content(): string {
     return this.props._content;
+  }
+
+  get authorId(): UniqueEntityId {
+    return this.props.authorId;
+  }
+
+  get articleId() {
+    return this.props.articleId;
   }
 }

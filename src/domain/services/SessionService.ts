@@ -3,18 +3,13 @@ import { IHashProvider } from "../providers/hashProvider";
 import { ITokenProvider } from "../providers/tokenProvider";
 import { IRefreshTokenRepository } from "../repositories";
 import { RefreshTokenFormat, UniqueEntityId } from "../value-objects";
-import {randomBytes} from 'node:crypto';
+import { randomBytes } from "node:crypto";
 
 export class SessionService {
   constructor(
     private refreshTokenRepo: IRefreshTokenRepository,
     private tokenProvider: ITokenProvider,
-    private hashProvider: IHashProvider
   ) {}
-
-  async generateSession(userId: UniqueEntityId, expires: Date, rawToken: RefreshTokenFormat): Promise<void> {
-    // await this.refreshTokenRepo.save({userId: userId, })
-  }
 
   async refresh(rawToken: RefreshTokenFormat): Promise<any> {
     const token = await this.refreshTokenRepo.findByToken(rawToken.toString());
@@ -34,7 +29,7 @@ export class SessionService {
     );
     return {
       accessToken,
-      refreshToken: token
+      refreshToken: token,
     };
   }
 }
