@@ -25,7 +25,7 @@ export class ArticleRepository implements IArticleRepository {
     const data = ArticleMapper.toDocument(article);
 
     const doc = await ArticleModel.findByIdAndUpdate(
-      article.id.getValue(),
+      article._id,
       data,
       { new: true, upsert: true }
     )

@@ -1,1 +1,1 @@
-export type TokenTypes =  'access' | 'recovery-password' | 'change-password'
+export type TokenTypes =  'activation' | 'recovery-password' | 'change-password'

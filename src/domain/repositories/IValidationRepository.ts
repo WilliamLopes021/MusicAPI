@@ -5,4 +5,5 @@ export interface IValidationRepository {
   delete(id: string): Promise<void>;
   findById(id: string): Promise<Validation | null>;
   findByUserId(id: string): Promise<Validation | null>;
+  findByCode(code: number): Promise<Validation | null>;
 }

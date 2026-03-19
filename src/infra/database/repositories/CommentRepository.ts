@@ -8,7 +8,7 @@ export class CommentRepository implements ICommentRepository {
     const document = CommentMapper.toDocument(data);
 
     const doc = await CommentModel.findByIdAndUpdate(
-      data.id.getValue(),
+      data.id,
       document,
       { new: true, upsert: true }
     );

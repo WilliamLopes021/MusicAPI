@@ -5,7 +5,7 @@ import { ValidationProps } from "../types/props/ValidationProps";
 export class Validation {
   constructor(
     private props: ValidationProps,
-    private readonly _id?: UniqueEntityId,
+    public readonly _id?: UniqueEntityId,
   ) {}
 
   get code(): number {

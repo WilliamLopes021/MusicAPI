@@ -8,7 +8,7 @@ export class RefreshTokenRepository implements IRefreshTokenRepository {
     const document = RefreshTokenMapper.toDocument(data);
 
     const doc = await RefreshTokenModel.findByIdAndUpdate(
-      data.id.getValue(),
+      data.id,
       document,
       { new: true, upsert: true },
     );

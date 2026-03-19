@@ -8,7 +8,7 @@ export class UserRepository implements IUserRepository {
     const document = UserMapper.toDocument(data);
 
     const doc = await UserModel.findByIdAndUpdate(
-      data.id.getValue(),
+      data._id,
       document,
       { new: true, upsert: true },
     );
